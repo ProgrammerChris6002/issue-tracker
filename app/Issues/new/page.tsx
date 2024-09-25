@@ -1,6 +1,6 @@
 'use client'
 
-import { TextField, Button, Callout, Text } from '@radix-ui/themes'
+import { TextField, Button, Callout } from '@radix-ui/themes'
 import React, { useState } from 'react'
 import SimpleMDE from 'react-simplemde-editor'
 import "easymde/dist/easymde.min.css"
@@ -23,6 +23,17 @@ const NewIssuePage = () => {
   const [ error, setError ] = useState('');
   const [ isSubmitting, setIsSubmitting ] = useState(false);
 
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      setIsSubmitting(true);
+      await axios.post('/api/issues', data);
+      router.push('/Issues');
+    } catch (error) {
+      setIsSubmitting(false);
+      setError('An unexpected error occured');
+    }
+  });
+
   return (
     <div className='max-w-xl'>
       { error && (<Callout.Root color="red" className='mb-5'>
@@ -30,16 +41,7 @@ const NewIssuePage = () => {
       </Callout.Root>) }
       <form
         className='space-y-3'
-        onSubmit={ handleSubmit((async (data) => {
-          try {
-            setIsSubmitting(true);
-            await axios.post('/api/issues', data);
-            router.push('/Issues');
-          } catch (error) {
-            setIsSubmitting(false);
-            setError('An unexpected error occured');
-          }
-        })) }>
+        onSubmit={ onSubmit }>
         <TextField.Root>
           <TextField.Input placeholder='Title' { ...register('title') } />
         </TextField.Root>
